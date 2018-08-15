@@ -5,11 +5,11 @@ ADDON = xbmcaddon.Addon()
 class crypt(object):
 
 
-    def __init__(self, pw, key, token):
+    def __init__(self, passw, key, token):
 
-        self.pw = ADDON.getSetting(pw)
+        self.passw = ADDON.getSetting(passw)
 
-        self.__pw_item  = pw
+        self.__pw_item  = passw
         self.__key = ADDON.getSetting(key)
         self.__key_item = key
         self.__token = ADDON.getSetting(token)
@@ -35,16 +35,16 @@ class crypt(object):
         is set to '*' and a key and token is generated and stored.
         '''
 
-        if self.pw == '' or self.pw == '*':
+        if self.passw == '' or self.passw == '*':
             if len(self.__key) > 2: return "".join([chr(ord(self.__token[i]) ^ ord(self.__key[i])) for i in range(int(self.__key[-2:]))])
             return ''
         else:
             self.__key = ''
-            for i in range((len(self.pw) / 16) + 1):
+            for i in range((len(self.passw) / 16) + 1):
                 self.__key += ('%016d' % int(random.random() * 10 ** 16))
-            self.__key = self.__key[:-2] + ('%02d' % len(self.pw))
-            __tpw = self.pw.ljust(len(self.__key), 'a')
+            self.__key = self.__key[:-2] + ('%02d' % len(self.passw))
+            __tpw = self.passw.ljust(len(self.__key), 'a')
 
             self.__token = "".join([chr(ord(__tpw[i]) ^ ord(self.__key[i])) for i in range(len(self.__key))])
             self.persist()
-            return self.pw
+            return self.passw
