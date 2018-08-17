@@ -3,6 +3,7 @@ import xbmcaddon
 import xbmc
 import json
 import re
+import platform
 
 ADDON = xbmcaddon.Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
@@ -15,7 +16,7 @@ STRING = 0
 BOOL = 1
 NUM = 2
 
-class crypt(object):
+class CryptDecrypt(object):
     '''
     :param passw: ID/Name of the associated password item in settings.xml
     :param key: ID of the associated key in settings, will be generated at first run
@@ -57,7 +58,27 @@ class crypt(object):
             self.persist()
             return self.passw
 
-class kodilib(object):
+class OsRelease(object):
+
+    def __init__(self):
+        self.platform = platform.system()
+        self.hostname = platform.node()
+        item = {}
+        if self.platform == 'Linux':
+
+            try:
+                with open('/etc/os-release', 'r') as _file:
+                    for _line in _file:
+                        parameter, value = _line.split('=')
+                        item[parameter] = value
+            except IOError, e:
+                KodiLib.writeLog(e.message, xbmc.LOGERROR)
+
+        self.osname = item.get('NAME', 'unknown')
+        self.osid = item.get('ID', 'unknown')
+        self.osversion = item.get('VERSION_ID', 'unknown')
+
+class KodiLib(object):
     '''
     several Kodi routines and functions
     '''
@@ -69,7 +90,7 @@ class kodilib(object):
         try:
             xbmc.log('[%s %s]: %s' % (ADDON_ID, ADDON_VERSION,  message.encode('utf-8')), level)
         except Exception:
-            xbmc.log('[%s %s]: %s' % (ADDON_ID, ADDON_VERSION,  'Fatal: Message could not displayed'), xbmc.LOGERROR)
+            xbmc.log('[%s %s]: %s' % (ADDON_ID, ADDON_VERSION,  'Fatal: Could not log message'), xbmc.LOGERROR)
 
     def jsonrpc(self, query):
         querystring = {"jsonrpc": "2.0", "id": 1}
@@ -78,7 +99,7 @@ class kodilib(object):
             response = json.loads(xbmc.executeJSONRPC(json.dumps(querystring, encoding='utf-8')))
             if 'result' in response: return response['result']
         except TypeError, e:
-            self.writeLog('Error executing JSON RPC: %s' % (e.message), xbmc.LOGFATAL)
+            self.writeLog('Error executing JSON RPC: %s' % (e.message), xbmc.LOGERROR)
         return False
 
     def getAddonSetting(self, setting, sType=STRING, multiplicator=1):
@@ -88,7 +109,7 @@ class kodilib(object):
             try:
                 return int(re.match('\d+', ADDON.getSetting(setting)).group()) * multiplicator
             except AttributeError:
-                self.writeLog('Could not read setting type NUM: %s' % (setting))
+                self.writeLog('Could not read setting type NUM: %s' % (setting), xbmc.LOGERROR)
                 return 0
         else:
             return ADDON.getSetting(setting)
