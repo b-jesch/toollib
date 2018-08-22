@@ -88,7 +88,7 @@ class KodiLib(object):
 
     def writeLog(self, message, level=xbmc.LOGDEBUG):
         try:
-            xbmc.log('[%s %s]: %s' % (ADDON_ID, ADDON_VERSION,  message.encode('utf-8')), level)
+            xbmc.log('[%s %s]: %s' % (ADDON_ID, ADDON_VERSION,  message), level)
         except Exception:
             xbmc.log('[%s %s]: %s' % (ADDON_ID, ADDON_VERSION,  'Fatal: Could not log message'), xbmc.LOGERROR)
 
