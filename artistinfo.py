@@ -73,7 +73,7 @@ class TheAudioDbWrapper(object):
 
     def getAlbumDetails(self):
         '''
-        reads MBID (MusicBrainz), ID (TheAudioDB) or name (needs additional artist name)of Album from class property
+        reads MBID (MusicBrainz), ID (TheAudioDB) or name (needs additional artist name) of Album from class property
         :return: detailed info of album as dict
         '''
 
@@ -89,6 +89,11 @@ class TheAudioDbWrapper(object):
 
 
     def getAlbumArtwork(self):
+        '''
+        reads MBID (MusicBrainz), ID (TheAudioDB) or name (needs additional artist name) of Album from class property
+        :return: album artwork selected from getAlbumDetails as subset of dict:
+            CDart, thumb, thumbback
+        '''
 
         album_artwork = dict()
         data = self.getAlbumDetails()
