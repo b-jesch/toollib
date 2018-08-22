@@ -34,14 +34,13 @@ class TheAudioDbWrapper(object):
             except (urllib2.URLError, socket.timeout):
                 return None
             return json.loads(data.read())
-            if data and (data.get('artists', False) or data.get('album', False)): return data[0][0]
         return None
 
 
     def getArtistDetails(self):
         '''
         reads MBID (MusicBrainz), ID (TheAudioDB) or name of artist from class property
-        :return: Detailed info of artist as dict
+        :return: Detailed info of artist as dict, fills empty class properties
         '''
 
         _query = None
@@ -50,7 +49,11 @@ class TheAudioDbWrapper(object):
         elif self.artistname: _query = '/search.php?s=%s' % (urllib2.quote(self.artistname))
 
         data = self.fetchAudioDB(_query)
-        if data and data.get('artists', False): return data['artists'][0]
+        if data and data.get('artists', False):
+            if not self.artistmbid: self.artistmbid = data['artists'][0].get('strMusicBrainzID', None)
+            if not self.artistid: self.artistid = data['artists'][0].get('idArtist', None)
+            if not self.artistname: self.artistname = data['artists'][0].get('strArtist', None)
+            return data['artists'][0]
         return None
 
 
@@ -74,7 +77,7 @@ class TheAudioDbWrapper(object):
     def getAlbumDetails(self):
         '''
         reads MBID (MusicBrainz), ID (TheAudioDB) or name (needs additional artist name) of Album from class property
-        :return: detailed info of album as dict
+        :return: detailed info of album as dict, fills empty class properties
         '''
 
         _query = None
@@ -84,7 +87,11 @@ class TheAudioDbWrapper(object):
             _query = '/searchalbum.php?s=%s&a=%s' % (urllib2.quote(self.artistname), urllib2.quote(self.albumname))
 
         data = self.fetchAudioDB(_query)
-        if data and data.get('album', False): return data['album'][0]
+        if data and data.get('album', False):
+            if not self.albummbid: self.albummbid = data['album'][0].get('strMusicBrainzID', None)
+            if not self.albumid: self.albumid = data['album'][0].get('idAlbum', None)
+            if not self.albumname: self.albumname = data['artists'][0].get('strAlbum', None)
+            return data['album'][0]
         return None
 
 
