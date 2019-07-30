@@ -5,6 +5,8 @@ import json
 import re
 import platform
 
+from contextlib import contextmanager
+
 ADDON = xbmcaddon.Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
 ADDON_NAME = ADDON.getAddonInfo('name')
@@ -78,6 +80,7 @@ class OsRelease(object):
         self.osid = item.get('ID', 'unknown')
         self.osversion = item.get('VERSION_ID', 'unknown')
 
+
 class KodiLib(object):
     '''
     several Kodi routines and functions
@@ -113,3 +116,21 @@ class KodiLib(object):
                 return 0
         else:
             return ADDON.getSetting(setting)
+
+    '''
+    creates a replacement for busy dialog in Kodi V.18 (Leia) build a wrapper function for this. The wrapper
+    guarantees that the busy dialog will be closed whatever happens inside the with block.
+    
+    use it as follows:
+    
+    with busy_dialog:
+        # script here whatever you want
+    '''
+
+    @contextmanager
+    def busy_dialog(self):
+        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+        try:
+            yield
+        finally:
+            xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
