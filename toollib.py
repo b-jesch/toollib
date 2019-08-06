@@ -1,4 +1,5 @@
 import random
+import xbmcgui
 import xbmcaddon
 import xbmc
 import json
@@ -134,3 +135,49 @@ class KodiLib(object):
             yield
         finally:
             xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+
+
+class KlProgressBar(object):
+    '''
+    creates a dialog progressbar with optional reverse progress
+        :header: heading line of progressbar
+        :msg: additional countdown message
+        :duration: duration of countdown
+        :steps: amount of steps of the countdown, choosing a value of 2*duration is perfect (actualising every 500 msec)
+        :reverse: reverse countdown (progressbar from 100 to 0)
+
+        :returns true if cancel button was pressed, otherwise false
+    '''
+
+    def __init__(self, header, msg, duration=5, steps=10, reverse=False):
+
+        self.header = header
+        self.msg = msg
+        self.timeout = 1000 * duration * steps / 100
+        self.steps = 100 / steps
+        self.reverse = reverse
+        self.iscanceled = False
+
+        self.pb = xbmcgui.DialogProgress()
+
+        self.max = 100
+        if self.reverse: self.max = 0
+
+        self.pb.create(self.header, self.msg)
+        self.pb.update(self.max, self.msg)
+
+
+    def show_progress(self):
+
+        percent = 100
+        while percent >= 0:
+            self.pb.update(self, self.max, self.msg)
+            if self.pb.iscanceled():
+                self.iscanceled = True
+                self.pb.close()
+                break
+
+            percent -= self.steps
+            self.max = 100 - percent if self.reverse else self.max = percent
+            xbmc.sleep(self.timeout)
+        return self.iscanceled
