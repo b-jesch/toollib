@@ -140,11 +140,11 @@ class KodiLib(object):
 class KlProgressBar(object):
     '''
     creates a dialog progressbar with optional reverse progress
-        :header: heading line of progressbar
-        :msg: additional countdown message
-        :duration: duration of countdown
-        :steps: amount of steps of the countdown, choosing a value of 2*duration is perfect (actualising every 500 msec)
-        :reverse: reverse countdown (progressbar from 100 to 0)
+        :param header: heading line of progressbar
+        :param msg: additional countdown message
+        :param duration: duration of countdown
+        :param steps: amount of steps of the countdown, choosing a value of 2*duration is perfect (actualising every 500 msec)
+        :param reverse: reverse countdown (progressbar from 100 to 0)
 
         :returns true if cancel button was pressed, otherwise false
     '''
