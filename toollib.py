@@ -153,15 +153,15 @@ class KlProgressBar(object):
 
         self.header = header
         self.msg = msg
-        self.timeout = 1000 * duration * steps / 100
+        self.timeout = 1000 * duration / steps
         self.steps = 100 / steps
         self.reverse = reverse
         self.iscanceled = False
 
         self.pb = xbmcgui.DialogProgress()
 
-        self.max = 100
-        if self.reverse: self.max = 0
+        self.max = 0
+        if self.reverse: self.max = 100
 
         self.pb.create(self.header, self.msg)
         self.pb.update(self.max, self.msg)
@@ -171,13 +171,15 @@ class KlProgressBar(object):
 
         percent = 100
         while percent >= 0:
-            self.pb.update(self, self.max, self.msg)
+            self.pb.update(self.max, self.msg)
             if self.pb.iscanceled():
                 self.iscanceled = True
-                self.pb.close()
                 break
 
             percent -= self.steps
-            self.max = 100 - percent if self.reverse else self.max = percent
+            self.max = 100 - percent
+            if self.reverse: self.max = percent
             xbmc.sleep(self.timeout)
+
+        self.pb.close()
         return self.iscanceled
