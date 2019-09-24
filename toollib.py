@@ -111,9 +111,10 @@ class KodiLib(object):
             return self.__strToBool(ADDON.getSetting(setting))
         elif sType == NUM:
             try:
-                return int(re.match('\d+', ADDON.getSetting(setting)).group()) * multiplicator
-            except AttributeError:
-                self.writeLog('Could not read setting type NUM: %s' % (setting), xbmc.LOGERROR)
+                return int(re.findall('([0-9]+)', ADDON.getSetting(setting))[0]) * multiplicator
+            except (IndexError, TypeError, AttributeError) as e:
+                self.writeLog('Could not get setting type NUM for %s, return with 0' % (setting), xbmc.LOGERROR)
+                self.writeLog(str(e.message))
                 return 0
         else:
             return ADDON.getSetting(setting)
