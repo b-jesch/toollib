@@ -19,14 +19,15 @@ STRING = 0
 BOOL = 1
 NUM = 2
 
+
 class CryptDecrypt(object):
-    '''
+    """
     :param passw: ID/Name of the associated password item in settings.xml
     :param key: ID of the associated key in settings, will be generated at first run
     :param token: ID of the token in settings, generated from password/key
     :return: decrypted password if password in settings is empty or *, else set password to '*' and generates key/token,
              stores password into settings.xml, key/token within userdata/addon_data/addon_id/settings.xml
-    '''
+    """
 
     def __init__(self, passw, key, token):
 
@@ -38,12 +39,10 @@ class CryptDecrypt(object):
         self.__token = ADDON.getSetting(token)
         self.__token_item = token
 
-
     def persist(self):
         ADDON.setSetting(self.__key_item, self.__key)
         ADDON.setSetting(self.__token_item, self.__token)
         ADDON.setSetting(self.__pw_item, '*')
-
 
     def crypt(self):
 
@@ -52,7 +51,7 @@ class CryptDecrypt(object):
             return ''
         else:
             self.__key = ''
-            for i in range((len(self.passw) / 16) + 1):
+            for i in range((len(self.passw) // 16) + 1):
                 self.__key += ('%016d' % int(random.random() * 10 ** 16))
             self.__key = self.__key[:-2] + ('%02d' % len(self.passw))
             __tpw = self.passw.ljust(len(self.__key), 'a')
@@ -60,6 +59,7 @@ class CryptDecrypt(object):
             self.__token = "".join([chr(ord(__tpw[i]) ^ ord(self.__key[i])) for i in range(len(self.__key))])
             self.persist()
             return self.passw
+
 
 class OsRelease(object):
 
@@ -74,7 +74,7 @@ class OsRelease(object):
                     for _line in _file:
                         parameter, value = _line.split('=')
                         item[parameter] = value
-            except IOError, e:
+            except IOError as e:
                 KodiLib.writeLog(e.message, xbmc.LOGERROR)
 
         self.osname = item.get('NAME', 'unknown')
@@ -83,9 +83,9 @@ class OsRelease(object):
 
 
 class KodiLib(object):
-    '''
+    """
     several Kodi routines and functions
-    '''
+    """
 
     def __strToBool(self, par):
         return True if par.upper() == 'TRUE' else False
@@ -102,8 +102,8 @@ class KodiLib(object):
         try:
             response = json.loads(xbmc.executeJSONRPC(json.dumps(querystring, encoding='utf-8')))
             if 'result' in response: return response['result']
-        except TypeError, e:
-            self.writeLog('Error executing JSON RPC: %s' % (e.message), xbmc.LOGERROR)
+        except TypeError as e:
+            self.writeLog('Error executing JSON RPC: %s' % e, xbmc.LOGERROR)
         return False
 
     def getAddonSetting(self, setting, sType=STRING, multiplicator=1):
@@ -139,7 +139,7 @@ class KodiLib(object):
 
 
 class KlProgressBar(object):
-    '''
+    """
     creates a dialog progressbar with optional reverse progress
         :param header: heading line of progressbar
         :param msg: additional countdown message
@@ -148,14 +148,14 @@ class KlProgressBar(object):
         :param reverse: reverse countdown (progressbar from 100 to 0)
 
         :returns true if cancel button was pressed, otherwise false
-    '''
+    """
 
     def __init__(self, header, msg, duration=5, steps=10, reverse=False):
 
         self.header = header
         self.msg = msg
-        self.timeout = 1000 * duration / steps
-        self.steps = 100 / steps
+        self.timeout = 1000 * duration // steps
+        self.steps = 100 // steps
         self.reverse = reverse
         self.iscanceled = False
 
@@ -166,7 +166,6 @@ class KlProgressBar(object):
 
         self.pb.create(self.header, self.msg)
         self.pb.update(self.max, self.msg)
-
 
     def show_progress(self):
 
